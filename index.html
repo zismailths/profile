@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Rana Ismail Ahmed's Portfolio - Secure, Modern, and Scalable Software. Cybersecurity Graduate, VAPT Analyst, GRC Analyst, SOC Analyst, DevSecOps Engineer.">
+  <title>Rana Ismail Ahmed | Cyber Security & Software Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Fine Grid Background -->
+  <div class="grid-overlay"></div>
+
+  <!-- Ambient Glows -->
+  <div class="radial-glow glow-top-right"></div>
+  <div class="radial-glow glow-center-left"></div>
+  <div class="radial-glow glow-bottom-right"></div>
+
+  <!-- Top sticky header & telemetry status -->
+  <header id="header">
+    <div class="telemetry-bar">
+      <div class="telemetry-ticker">
+        <span class="ticker-text">
+          [SYS_OK] SECURE_SOCKET: ACTIVE // PORT_FIREWALL: STANDBY // THREAT_LEVEL: 0 // ACTIVE_CONNECTION: LOCAL // MOCK_TRAFFIC_BLOCK: 0 // SYSTEM_UPTIME: 99.98% // DEPLOYED_VER: 2.6.0-SEC //
+        </span>
+      </div>
+      <div class="telemetry-status">
+        <span id="protocol-status-text" style="color: var(--color-primary); font-weight: bold;">VAPT_ACTIVE</span>
+        <span>FW: ACTIVE</span>
+        <span class="status-dot"></span>
+        <span id="current-time">UTC 00:00:00</span>
+      </div>
+    </div>
+
+    <nav class="navbar">
+      <a href="#" class="logo">
+        <span>&lt;</span>RANA ISMAIL<span> /&gt;</span>
+      </a>
+
+      <!-- Rounded Segmented Toggle Selector -->
+      <div class="navbar-protocol-switcher">
+        <button class="protocol-btn active" data-protocol="vapt">VAPT</button>
+        <button class="protocol-btn" data-protocol="grc">GRC</button>
+        <button class="protocol-btn" data-protocol="soc">SOC</button>
+        <button class="protocol-btn" data-protocol="devsecops">DevSecOps</button>
+      </div>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#hero" class="active">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#certifications">Certifications & Achievements</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="terminal-toggle-btn" id="terminal-trigger" title="Toggle Secure Terminal">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+          <span>Terminal</span>
+        </button>
+        <button class="mobile-menu-toggle" id="menu-toggle" aria-label="Toggle Navigation Menu">
+          &#9776;
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="hero" class="hero">
+    <!-- Node network canvas -->
+    <canvas id="particles-canvas"></canvas>
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <div class="hero-subtitle">RANA ISMAIL AHMED</div>
+        <h1 class="hero-title" style="margin-top: 10px;">
+          <span class="matrix-decrypt" id="dynamic-role" data-value="VAPT Analyst">VAPT Analyst</span>
+        </h1>
+        <p class="hero-description" id="dynamic-summary">
+          Cybersecurity graduate specializing in penetration testing, vulnerability assessment, and offensive security. Experienced in web application testing, reconnaissance automation, and exploit development through hands-on labs, CTFs, and vulnerable machine environments. Certified in ISC2-CC.
+        </p>
+        <div class="hero-badges" id="dynamic-badges">
+          <!-- Dynamically loaded badges -->
+        </div>
+        <div class="hero-buttons">
+          <a href="#projects" class="btn btn-primary">View Projects</a>
+          <a href="#contact" class="btn btn-secondary">Contact Me</a>
+        </div>
+      </div>
+
+      <div class="hero-graphic-container">
+        <div class="hero-graphic">
+          <div class="crosshair ch-tl"></div>
+          <div class="crosshair ch-tr"></div>
+          <div class="crosshair ch-bl"></div>
+          <div class="crosshair ch-br"></div>
+          <img src="assets/cyber_hero_graphic_final.png" alt="Cyber Security Professional Graphics" class="hero-avatar">
+        </div>
+      </div>
+    </div>
+
+
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="reveal">
+    <div class="container">
+      <h2 class="matrix-decrypt" data-value="About Me">About Me</h2>
+      <div class="about-grid" style="margin-top: 40px;">
+        <div class="about-text" id="about-biography">
+          <!-- Dynamically populated about paragraphs -->
+        </div>
+
+        <div class="about-metrics" id="about-metrics">
+          <!-- Dynamically populated metrics cards -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills Section -->
+  <section id="skills" class="reveal">
+    <div class="container">
+      <h2 class="matrix-decrypt" data-value="Technical Arsenal">Technical Arsenal</h2>
+      
+      <div class="skills-container" id="skills-container" style="margin-top: 50px;">
+        <!-- Dynamically populated skills categories and tags -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Section -->
+  <section id="projects" class="reveal">
+    <div class="container">
+      <div class="projects-header">
+        <div>
+          <h2 class="matrix-decrypt" data-value="Featured Projects">Featured Projects</h2>
+        </div>
+        <div class="projects-filter" id="projects-filter-bar">
+          <!-- Dynamically populated filter buttons -->
+        </div>
+      </div>
+
+      <div class="projects-grid" id="projects-container">
+        <!-- Dynamically populated project cards -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience Section -->
+  <section id="experience" class="reveal">
+    <div class="container">
+      <h2 class="matrix-decrypt" data-value="Chronological Progression">Chronological Progression</h2>
+      
+      <div class="timeline" id="experience-timeline" style="margin-top: 50px;">
+        <!-- Dynamically populated timeline cards -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Certifications Section -->
+  <section id="certifications" class="reveal">
+    <div class="container">
+      <h2 class="matrix-decrypt" id="certifications-heading" data-value="Certifications and Achievements">Certifications and Achievements</h2>
+      
+      <!-- 3D Coverflow Certificate Carousel -->
+      <div class="certs-carousel-wrapper">
+        <button class="carousel-control prev-btn" aria-label="Previous Certificate">&#10094;</button>
+        <div class="certs-carousel-container" id="certs-carousel">
+          <div class="carousel-track" id="carousel-track">
+            <div class="carousel-slide" data-index="0">
+              <img src="assets/certs/1.avif" alt="Certificate 1">
+            </div>
+            <div class="carousel-slide" data-index="1">
+              <img src="assets/certs/2.avif" alt="Certificate 2">
+            </div>
+            <div class="carousel-slide" data-index="2">
+              <img src="assets/certs/3.avif" alt="Certificate 3">
+            </div>
+            <div class="carousel-slide" data-index="3">
+              <img src="assets/certs/4.avif" alt="Certificate 4">
+            </div>
+            <div class="carousel-slide" data-index="4">
+              <img src="assets/certs/5.avif" alt="Certificate 5">
+            </div>
+            <div class="carousel-slide" data-index="5">
+              <img src="assets/certs/6.avif" alt="Certificate 6">
+            </div>
+            <div class="carousel-slide" data-index="6">
+              <img src="assets/certs/7.avif" alt="Certificate 7">
+            </div>
+            <div class="carousel-slide" data-index="7">
+              <img src="assets/certs/8.avif" alt="Certificate 8">
+            </div>
+          </div>
+        </div>
+        <button class="carousel-control next-btn" aria-label="Next Certificate">&#10095;</button>
+      </div>
+
+      <div class="certifications-grid" id="certifications-container" style="margin-top: 50px;">
+        <!-- Dynamically populated certifications & courses cards -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="reveal">
+    <div class="container">
+      <h2 class="matrix-decrypt" data-value="Initiate Connection">Initiate Connection</h2>
+      
+      <div class="contact-grid" style="margin-top: 50px;">
+        <div class="contact-info">
+          <p class="contact-lead">
+            Have a project in mind, an opportunity, or simply want to talk tech and security? Launch an encrypted ping in my direction.
+          </p>
+          
+          <div class="contact-methods">
+            <div class="contact-method">
+              <div class="contact-icon-box">📧</div>
+              <div class="contact-details">
+                <span class="contact-label">Email</span>
+                <a href="mailto:zismail.ths@gmail.com" class="contact-val">zismail.ths@gmail.com</a>
+              </div>
+            </div>
+
+            <div class="contact-method">
+              <div class="contact-icon-box">📞</div>
+              <div class="contact-details">
+                <span class="contact-label">Phone</span>
+                <a href="tel:+923199238727" class="contact-val">+92 319 9238727</a>
+              </div>
+            </div>
+
+            <div class="contact-method">
+              <div class="contact-icon-box">🔗</div>
+              <div class="contact-details">
+                <span class="contact-label">LinkedIn</span>
+                <a href="https://linkedin.com/in/rana-ismail-ahmed" target="_blank" rel="noopener noreferrer" class="contact-val">linkedin.com/in/rana-ismail-ahmed</a>
+              </div>
+            </div>
+
+            <div class="contact-method">
+              <div class="contact-icon-box">💻</div>
+              <div class="contact-details">
+                <span class="contact-label">GitHub</span>
+                <a href="https://github.com/zismailths" target="_blank" rel="noopener noreferrer" class="contact-val">github.com/zismailths</a>
+              </div>
+            </div>
+
+            <div class="contact-method">
+              <div class="contact-icon-box">📍</div>
+              <div class="contact-details">
+                <span class="contact-label">Location / DOB</span>
+                <span class="contact-val">Karachi, Pakistan | 20 Feb 2004</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form class="contact-form" id="contact-form">
+          <div class="form-group">
+            <label for="name">NAME / CALLSIGN</label>
+            <input type="text" id="name" required placeholder="Enter name or agency">
+          </div>
+          <div class="form-group">
+            <label for="email">REPLY ADDRESS</label>
+            <input type="email" id="email" required placeholder="name@domain.com">
+          </div>
+          <div class="form-group">
+            <label for="subject">OBJECTIVE / SUBJECT</label>
+            <input type="text" id="subject" required placeholder="Consultation / Collab / Query">
+          </div>
+          <div class="form-group">
+            <label for="message">ENCRYPTED MESSAGE CONTENT</label>
+            <textarea id="message" required placeholder="Draft your secure communication packet here..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Send Encrypted Packet</button>
+          <div id="form-feedback" style="display: none; font-family: var(--font-mono); font-size: 13px; text-align: center; margin-top: 10px;"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Terminal Widget Overlay -->
+  <div class="terminal-overlay" id="terminal-widget">
+    <div class="terminal-header">
+      <div class="terminal-title">rana-ismail@secure-console: ~</div>
+      <div class="terminal-controls">
+        <button class="terminal-control-dot terminal-minimize" id="terminal-minimize" title="Minimize">—</button>
+        <button class="terminal-control-dot terminal-close" id="terminal-close" title="Close">×</button>
+      </div>
+    </div>
+    <div class="terminal-body">
+      <div class="terminal-welcome">
+        ============================================================<br>
+        * SECURE CLI INTERFACE V3.14 - RANA ISMAIL PORTFOLIO CORE *<br>
+        ============================================================<br>
+        Type <span class="command">'help'</span> for available system commands (e.g., 'protocol <span class="info">&lt;mode&gt;</span>').<br>
+        Access granted to guest shell. Security logging engaged.
+      </div>
+      <div class="terminal-output" id="terminal-output"></div>
+      <div class="terminal-input-line">
+        <span class="terminal-prompt">guest@rana-ismail-shell:~$</span>
+        <input type="text" class="terminal-input" id="terminal-input" autocomplete="off" autofocus>
+      </div>
+    </div>
+    <div class="crt-overlay"></div>
+  </div>
+
+  <!-- Minimized Terminal Handle -->
+  <div class="terminal-minimized-handle" id="terminal-minimized-handle" style="display: none;">
+    <span class="handle-blink">&gt;_</span> terminal_active
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-content">
+      <span class="footer-text">&copy; 2026 Rana Ismail Ahmed. Designed &amp; Developed with Security Focus.</span>
+      <div class="footer-socials">
+        <a href="https://github.com/zismailths" target="_blank" rel="noopener noreferrer" aria-label="GitHub">GH</a>
+        <a href="https://linkedin.com/in/rana-ismail-ahmed" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">LI</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
