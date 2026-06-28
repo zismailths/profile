@@ -526,15 +526,43 @@ function initMobileMenu() {
   const menuToggle = document.getElementById('menu-toggle');
   const navLinks = document.getElementById('nav-links');
 
+  // Create overlay element for mobile nav backdrop
+  let navOverlay = document.querySelector('.nav-overlay');
+  if (!navOverlay) {
+    navOverlay = document.createElement('div');
+    navOverlay.className = 'nav-overlay';
+    document.body.appendChild(navOverlay);
+  }
+
+  function openMenu() {
+    navLinks.classList.add('open');
+    navOverlay.classList.add('visible');
+    menuToggle.innerHTML = '&#10005;'; // X icon
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    navLinks.classList.remove('open');
+    navOverlay.classList.remove('visible');
+    menuToggle.innerHTML = '&#9776;'; // Hamburger icon
+    document.body.style.overflow = '';
+  }
+
   if (menuToggle && navLinks) {
     menuToggle.addEventListener('click', () => {
-      navLinks.classList.toggle('open');
+      if (navLinks.classList.contains('open')) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
     });
 
+    // Close menu when clicking overlay
+    navOverlay.addEventListener('click', closeMenu);
+
+    // Close menu when clicking a nav link
     navLinks.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        navLinks.classList.remove('open');
-      });
+      link.addEventListener('click', closeMenu);
     });
   }
 
@@ -1411,6 +1439,26 @@ function initCertCarousel() {
 
   function updateCarousel() {
     const n = slides.length;
+    const isMobile = window.innerWidth <= 480;
+    const isTablet = window.innerWidth <= 768 && window.innerWidth > 480;
+
+    let translateStep = 180;
+    let sideOffset = 30;
+    let zOffset = -120;
+    let centerZ = 50;
+
+    if (isMobile) {
+      translateStep = 80;
+      sideOffset = 15;
+      zOffset = -80;
+      centerZ = 20;
+    } else if (isTablet) {
+      translateStep = 120;
+      sideOffset = 20;
+      zOffset = -100;
+      centerZ = 30;
+    }
+
     slides.forEach((slide, index) => {
       let offset = index - activeIndex;
 
@@ -1420,32 +1468,32 @@ function initCertCarousel() {
 
       const absOffset = Math.abs(offset);
 
-      // Hide slides that are too far away (show exactly center + 2 on left + 2 on right)
+      // Hide slides that are too far away
       if (absOffset > 2) {
         slide.style.opacity = '0';
         slide.style.pointerEvents = 'none';
-        slide.style.transform = `translateX(${offset * 140}px) scale(0.5) rotateY(${offset > 0 ? -45 : 45}deg) translateZ(-300px)`;
+        slide.style.transform = `translateX(${offset * (translateStep - 20)}px) scale(0.5) rotateY(${offset > 0 ? -45 : 45}deg) translateZ(-300px)`;
         return;
       }
 
       slide.style.opacity = '1';
       slide.style.pointerEvents = 'auto';
 
-      let translateX = offset * 180;
+      let translateX = offset * translateStep;
       let rotateY = 0;
-      let translateZ = -120 * absOffset;
+      let translateZ = zOffset * absOffset;
       let scale = 1 - absOffset * 0.15;
 
       if (offset < 0) {
-        rotateY = 30;
-        translateX -= 30;
+        rotateY = 25;
+        translateX -= sideOffset;
       } else if (offset > 0) {
-        rotateY = -30;
-        translateX += 30;
+        rotateY = -25;
+        translateX += sideOffset;
       } else {
         // Active center slide
         rotateY = 0;
-        translateZ = 50;
+        translateZ = centerZ;
         scale = 1.05;
       }
 
@@ -1487,5 +1535,6 @@ function initCertCarousel() {
     });
   }
 
+  window.addEventListener('resize', updateCarousel);
   updateCarousel();
 }

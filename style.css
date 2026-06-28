@@ -42,6 +42,8 @@ html {
   scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: var(--color-primary) var(--color-bg);
+  overflow-x: hidden;
+  width: 100%;
 }
 
 body {
@@ -52,6 +54,7 @@ body {
   line-height: 1.6;
   overflow-x: hidden;
   position: relative;
+  width: 100%;
 }
 
 /* Custom Scrollbar */
@@ -122,6 +125,7 @@ body::-webkit-scrollbar-thumb:hover {
 
 /* Containers */
 .container {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
@@ -389,6 +393,8 @@ section {
   padding: 120px 0;
   position: relative;
   z-index: 2;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 /* Hero Section */
@@ -1378,16 +1384,88 @@ footer {
 .delay-400 { transition-delay: 400ms; }
 
 /* ==========================================================================
+   MOBILE NAV OVERLAY BACKDROP
+   ========================================================================== */
+
+.nav-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 98;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.nav-overlay.visible {
+  display: block;
+  opacity: 1;
+}
+
+/* ==========================================================================
    MEDIA QUERIES (RESPONSIVENESS)
    ========================================================================== */
 
+/* ---------- Large Tablets / Small Laptops (≤ 1200px) ---------- */
+@media (max-width: 1200px) {
+  .container {
+    padding: 0 20px;
+  }
+
+  .nav-links {
+    gap: 20px;
+  }
+
+  .nav-links a {
+    font-size: 13px;
+  }
+
+  .hero-graphic {
+    width: 280px;
+    height: 280px;
+  }
+
+  .hero-avatar {
+    width: 240px;
+    height: 240px;
+  }
+
+  .projects-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+/* ---------- Tablets (≤ 992px) ---------- */
 @media (max-width: 992px) {
+  section {
+    padding: 80px 0;
+  }
+
+  .hero {
+    height: auto;
+    min-height: auto;
+    padding-top: 140px;
+    padding-bottom: 60px;
+  }
+
   .hero-grid {
     grid-template-columns: 1fr;
     text-align: center;
-    gap: 30px;
+    gap: 40px;
   }
-  
+
+  .hero-content {
+    order: 2;
+  }
+
+  .hero-graphic-container {
+    order: 1;
+  }
+
   .hero-subtitle {
     justify-content: center;
   }
@@ -1404,66 +1482,519 @@ footer {
     justify-content: center;
   }
 
+  .hero-graphic {
+    width: 260px;
+    height: 260px;
+  }
+
+  .hero-avatar {
+    width: 220px;
+    height: 220px;
+  }
+
   .about-grid {
     grid-template-columns: 1fr;
     gap: 40px;
+  }
+
+  .about-text {
+    text-align: center;
+  }
+
+  .about-metrics {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .contact-grid {
     grid-template-columns: 1fr;
     gap: 40px;
   }
+
+  .projects-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .projects-filter {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .projects-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+
+  .skill-tag.icon-only {
+    width: 100px;
+    height: 100px;
+  }
+
+  .skill-tag.icon-only svg,
+  .skill-tag.icon-only img.tool-icon-img {
+    width: 80px;
+    height: 80px;
+  }
 }
 
+/* ---------- Small Tablets / Large Phones (≤ 768px) ---------- */
 @media (max-width: 768px) {
+  /* --- Mobile Navigation Drawer --- */
   .nav-links {
-    display: none; /* Let's build mobile toggle menu via JS classes */
-  }
-  
-  .nav-links.open {
     display: flex;
     flex-direction: column;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background-color: var(--color-bg);
-    border-bottom: 1px solid var(--color-border);
-    padding: 20px 24px;
-    gap: 16px;
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    height: 100dvh;
+    background-color: rgba(10, 10, 10, 0.98);
+    backdrop-filter: blur(16px);
+    border-left: 1px solid var(--color-border);
+    padding: 80px 28px 40px;
+    gap: 8px;
     z-index: 99;
+    transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+  }
+
+  .nav-links.open {
+    right: 0;
+  }
+
+  .nav-links a {
+    font-size: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(51, 51, 51, 0.4);
+  }
+
+  .nav-links a:last-child {
+    border-bottom: none;
   }
 
   .mobile-menu-toggle {
     display: block;
   }
 
+  /* --- Terminal Widget --- */
   .terminal-overlay {
     width: calc(100% - 48px);
     right: 24px;
     left: 24px;
     height: 350px;
   }
+
+  /* --- Telemetry Bar --- */
+  .telemetry-bar {
+    padding: 4px 16px;
+    font-size: 10px;
+  }
+
+  .telemetry-ticker {
+    display: none;
+  }
+
+  .telemetry-status {
+    width: 100%;
+    justify-content: center;
+    gap: 10px;
+    font-size: 10px;
+  }
+
+  /* --- Navbar --- */
+  .navbar {
+    padding: 14px 16px;
+  }
+
+  .header-scrolled .navbar {
+    padding: 10px 16px;
+  }
+
+  .terminal-toggle-btn span {
+    display: none;
+  }
+
+  .terminal-toggle-btn {
+    padding: 8px 10px;
+  }
+
+  /* --- Hero --- */
+  .hero {
+    padding-top: 120px;
+    padding-bottom: 50px;
+  }
+
+  h1 {
+    font-size: clamp(36px, 8vw, 56px);
+  }
+
+  h2 {
+    font-size: clamp(26px, 5vw, 36px);
+  }
+
+  .hero-description {
+    font-size: 16px;
+  }
+
+  /* --- Skills --- */
+  .skills-tags {
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .skill-tag.icon-only {
+    width: 90px;
+    height: 90px;
+  }
+
+  .skill-tag.icon-only svg,
+  .skill-tag.icon-only img.tool-icon-img {
+    width: 70px;
+    height: 70px;
+  }
+
+  .skills-category-title {
+    text-align: center;
+  }
+
+  /* --- Projects --- */
+  .projects-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .project-image-wrapper {
+    height: 180px;
+  }
+
+  .project-info {
+    padding: 20px;
+  }
+
+  /* --- Timeline --- */
+  .timeline {
+    padding: 10px 0;
+  }
+
+  .timeline-card {
+    padding: 20px;
+  }
+
+  /* --- Certifications --- */
+  .certifications-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .cert-card {
+    padding: 20px;
+  }
+
+  /* --- Contact --- */
+  .contact-form {
+    padding: 28px 20px;
+  }
+
+  .contact-lead {
+    font-size: 16px;
+    text-align: center;
+  }
+
+  /* --- Footer --- */
+  footer {
+    padding: 30px 0;
+  }
+
+  .footer-text {
+    font-size: 12px;
+  }
 }
 
+/* ---------- Small Phones (≤ 480px) ---------- */
 @media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  section {
+    padding: 60px 0;
+  }
+
+  /* --- Buttons --- */
   .btn {
     width: 100%;
+    padding: 12px 20px;
+    font-size: 15px;
   }
 
   .hero-buttons {
     flex-direction: column;
     gap: 12px;
   }
-  
-  .terminal-overlay {
-    right: 12px;
-    left: 12px;
-    width: calc(100% - 24px);
+
+  /* --- Telemetry --- */
+  .telemetry-bar {
+    padding: 3px 12px;
   }
-  
+
   .telemetry-status {
+    font-size: 9px;
+    gap: 6px;
+  }
+
+  #protocol-status-text {
     display: none;
+  }
+
+  /* --- Navbar --- */
+  .navbar {
+    padding: 12px 12px;
+  }
+
+  .logo {
+    font-size: 16px;
+  }
+
+  /* --- Hero --- */
+  .hero {
+    padding-top: 110px;
+    padding-bottom: 40px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 8vw, 42px);
+  }
+
+  h2 {
+    font-size: clamp(22px, 6vw, 30px);
+    margin-bottom: 24px;
+  }
+
+  .hero-graphic {
+    width: 200px;
+    height: 200px;
+  }
+
+  .hero-avatar {
+    width: 170px;
+    height: 170px;
+  }
+
+  .hero-description {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .hero-badges {
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .hero-badge {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  /* --- About --- */
+  .about-text {
+    font-size: 15px;
+  }
+
+  .about-metrics {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .metric-card {
+    padding: 20px 8px;
+  }
+
+  .metric-num {
+    font-size: 26px;
+  }
+
+  .metric-label {
+    font-size: 12px;
+  }
+
+  /* --- Skills --- */
+  .skills-tags {
+    gap: 8px;
+  }
+
+  .skill-tag {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .skill-tag.icon-only {
+    width: 80px;
+    height: 80px;
+  }
+
+  .skill-tag.icon-only svg,
+  .skill-tag.icon-only img.tool-icon-img {
+    width: 60px;
+    height: 60px;
+  }
+
+  /* --- Projects --- */
+  .projects-header {
+    margin-bottom: 30px;
+  }
+
+  .filter-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .project-image-wrapper {
+    height: 160px;
+  }
+
+  .project-info {
+    padding: 16px;
+  }
+
+  .project-title {
+    font-size: 17px;
+  }
+
+  .project-desc {
+    font-size: 13px;
+  }
+
+  /* --- Timeline --- */
+  .timeline::before {
+    left: 14px;
+  }
+
+  .timeline-item {
+    padding-left: 40px;
+    margin-bottom: 28px;
+  }
+
+  .timeline-dot {
+    left: 5px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .timeline-card {
+    padding: 16px;
+  }
+
+  .timeline-role {
+    font-size: 16px;
+  }
+
+  .timeline-org {
+    font-size: 12px;
+  }
+
+  .timeline-desc {
+    font-size: 13px;
+  }
+
+  .timeline-date {
+    font-size: 12px;
+  }
+
+  /* --- Certifications --- */
+  .certifications-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .cert-card {
+    padding: 18px;
+  }
+
+  .cert-icon {
+    font-size: 26px;
+    margin-bottom: 12px;
+  }
+
+  .cert-title {
+    font-size: 16px;
+  }
+
+  /* --- Contact --- */
+  .contact-form {
+    padding: 24px 16px;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .contact-icon-box {
+    width: 38px;
+    height: 38px;
+    font-size: 14px;
+  }
+
+  .contact-val {
+    font-size: 14px;
+  }
+
+  .contact-label {
+    font-size: 11px;
+  }
+
+  /* --- Terminal --- */
+  .terminal-overlay {
+    right: 8px;
+    left: 8px;
+    width: calc(100% - 16px);
+    height: 320px;
+  }
+
+  .terminal-body {
+    font-size: 11px;
+  }
+
+  .terminal-prompt {
+    font-size: 11px;
+  }
+
+  .terminal-input {
+    font-size: 11px;
+  }
+
+  /* --- Terminal Minimized Handle --- */
+  .terminal-minimized-handle {
+    right: 12px;
+    bottom: 12px;
+    font-size: 10px;
+    padding: 8px 12px;
+  }
+
+  /* --- Footer --- */
+  .footer-text {
+    font-size: 11px;
+  }
+
+  /* --- Lightbox Modal --- */
+  .project-image-modal-content {
+    max-width: 95%;
+  }
+
+  .project-image-modal-close {
+    font-size: 28px;
+    top: 10px;
+    right: 14px;
   }
 }
 
@@ -1632,6 +2163,7 @@ footer {
 @media (max-width: 768px) {
   .certs-carousel-wrapper {
     padding: 0 20px;
+    margin: 30px auto 40px;
   }
   .carousel-slide {
     width: 280px;
@@ -1645,6 +2177,38 @@ footer {
   }
   .next-btn {
     margin-left: -10px;
+  }
+  .carousel-control {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .certs-carousel-wrapper {
+    padding: 0 12px;
+    margin: 20px auto 30px;
+  }
+  .carousel-slide {
+    width: 220px;
+    height: 145px;
+    border-radius: 8px;
+  }
+  .certs-carousel-container {
+    height: 200px;
+    perspective: 800px;
+  }
+  .carousel-control {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+  .prev-btn {
+    margin-right: -6px;
+  }
+  .next-btn {
+    margin-left: -6px;
   }
 }
 
