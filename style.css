@@ -61,13 +61,16 @@ body {
 body::-webkit-scrollbar {
   width: 8px;
 }
+
 body::-webkit-scrollbar-track {
   background: var(--color-bg);
 }
+
 body::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border-radius: 4px;
 }
+
 body::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary);
 }
@@ -79,7 +82,7 @@ body::-webkit-scrollbar-thumb:hover {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: 
+  background-image:
     linear-gradient(rgba(51, 51, 51, 0.15) 1px, transparent 1px),
     linear-gradient(90deg, rgba(51, 51, 51, 0.15) 1px, transparent 1px);
   background-size: 50px 50px;
@@ -137,7 +140,10 @@ body::-webkit-scrollbar-thumb:hover {
    TYPOGRAPHY
    ========================================================================== */
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-weight: 700;
   letter-spacing: -0.03em;
   color: var(--color-text-primary);
@@ -404,6 +410,7 @@ section {
   display: flex;
   align-items: flex-start;
   padding-top: 155px;
+  overflow: visible;
 }
 
 .hero-grid {
@@ -530,10 +537,33 @@ section {
   pointer-events: none;
 }
 
-.ch-tl { top: -5px; left: -5px; border-right: none; border-bottom: none; }
-.ch-tr { top: -5px; right: -5px; border-left: none; border-bottom: none; }
-.ch-bl { bottom: -5px; left: -5px; border-right: none; border-top: none; }
-.ch-br { bottom: -5px; right: -5px; border-left: none; border-top: none; }
+.ch-tl {
+  top: -5px;
+  left: -5px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.ch-tr {
+  top: -5px;
+  right: -5px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.ch-bl {
+  bottom: -5px;
+  left: -5px;
+  border-right: none;
+  border-top: none;
+}
+
+.ch-br {
+  bottom: -5px;
+  right: -5px;
+  border-left: none;
+  border-top: none;
+}
 
 
 
@@ -677,7 +707,8 @@ section {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: help; /* show question mark/help icon since it reveals title on hover */
+  cursor: help;
+  /* show question mark/help icon since it reveals title on hover */
   background-color: #181818 !important;
   border-color: #222222;
 }
@@ -1232,7 +1263,8 @@ a.contact-val:hover {
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.5;
-  color: #39FF14; /* Matrix Green, or white smoke depending on aesthetic. Let's make it a clean light gray/red, or neon green for contrast. Let's use light red and white for cybersecurity console! */
+  color: #39FF14;
+  /* Matrix Green, or white smoke depending on aesthetic. Let's make it a clean light gray/red, or neon green for contrast. Let's use light red and white for cybersecurity console! */
   color: #e0e0e0;
 }
 
@@ -1240,9 +1272,11 @@ a.contact-val:hover {
 .terminal-body::-webkit-scrollbar {
   width: 6px;
 }
+
 .terminal-body::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .terminal-body::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border-radius: 3px;
@@ -1356,13 +1390,23 @@ footer {
    ========================================================================== */
 
 @keyframes ticker {
-  0% { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-20%, 0, 0); }
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(-20%, 0, 0);
+  }
 }
 
 @keyframes pulse-green {
-  0% { box-shadow: 0 0 2px #4CAF50; }
-  100% { box-shadow: 0 0 10px #4CAF50; }
+  0% {
+    box-shadow: 0 0 2px #4CAF50;
+  }
+
+  100% {
+    box-shadow: 0 0 10px #4CAF50;
+  }
 }
 
 
@@ -1380,10 +1424,21 @@ footer {
 }
 
 /* Delay modifiers */
-.delay-100 { transition-delay: 100ms; }
-.delay-200 { transition-delay: 200ms; }
-.delay-300 { transition-delay: 300ms; }
-.delay-400 { transition-delay: 400ms; }
+.delay-100 {
+  transition-delay: 100ms;
+}
+
+.delay-200 {
+  transition-delay: 200ms;
+}
+
+.delay-300 {
+  transition-delay: 300ms;
+}
+
+.delay-400 {
+  transition-delay: 400ms;
+}
 
 /* ==========================================================================
    MOBILE NAV OVERLAY BACKDROP
@@ -1549,6 +1604,7 @@ footer {
 
 /* ---------- Small Tablets / Large Phones (≤ 768px) ---------- */
 @media (max-width: 768px) {
+
   /* --- Mobile Navigation Drawer --- */
   .nav-links {
     display: flex;
@@ -2047,6 +2103,7 @@ footer {
   .navbar-protocol-switcher {
     margin-left: 10px;
   }
+
   .navbar-protocol-switcher .protocol-btn {
     padding: 6px 8px;
     font-size: 9px;
@@ -2058,6 +2115,7 @@ footer {
     flex-wrap: wrap;
     gap: 10px;
   }
+
   .navbar-protocol-switcher {
     order: 3;
     width: 100%;
@@ -2167,19 +2225,24 @@ footer {
     padding: 0 20px;
     margin: 30px auto 40px;
   }
+
   .carousel-slide {
     width: 280px;
     height: 180px;
   }
+
   .certs-carousel-container {
     height: 240px;
   }
+
   .prev-btn {
     margin-right: -10px;
   }
+
   .next-btn {
     margin-left: -10px;
   }
+
   .carousel-control {
     width: 36px;
     height: 36px;
@@ -2192,23 +2255,28 @@ footer {
     padding: 0 12px;
     margin: 20px auto 30px;
   }
+
   .carousel-slide {
     width: 220px;
     height: 145px;
     border-radius: 8px;
   }
+
   .certs-carousel-container {
     height: 200px;
     perspective: 800px;
   }
+
   .carousel-control {
     width: 32px;
     height: 32px;
     font-size: 12px;
   }
+
   .prev-btn {
     margin-right: -6px;
   }
+
   .next-btn {
     margin-left: -6px;
   }
@@ -2219,7 +2287,8 @@ footer {
    ========================================================================== */
 .cert-card.coming-soon {
   position: relative;
-  background-color: #1a1a1a !important; /* Grey card */
+  background-color: #1a1a1a !important;
+  /* Grey card */
   border-color: #333333;
   overflow: hidden;
   min-height: 180px;
@@ -2251,7 +2320,8 @@ footer {
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  background-color: var(--color-primary); /* Turns red on hover! */
+  background-color: var(--color-primary);
+  /* Turns red on hover! */
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   transform: translateY(100%);
   opacity: 0;
@@ -2316,7 +2386,9 @@ footer {
 }
 
 @keyframes terminal-blink {
-  50% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
 
 /* Project Image Lightbox Modal */
@@ -2373,10 +2445,7 @@ footer {
 }
 
 @keyframes fadeInModal {
-  to { opacity: 1; }
+  to {
+    opacity: 1;
+  }
 }
-
-
-
-
-

@@ -588,9 +588,9 @@ function initCanvasGrid() {
   let height = (canvas.height = window.innerHeight);
 
   const particles = [];
-  const maxParticles = 150;
-  const connectionDistance = 130;
-  const mouse = { x: null, y: null, radius: 150 };
+  const maxParticles = 100;
+  const connectionDistance = 150;
+  const mouse = { x: null, y: null, radius: 250 };
 
   window.addEventListener('resize', () => {
     width = canvas.width = window.innerWidth;
@@ -628,7 +628,7 @@ function initCanvasGrid() {
 
     draw() {
       ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 3);
       ctx.fillStyle = 'rgba(214, 31, 38, 0.7)';
       ctx.fill();
     }
