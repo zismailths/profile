@@ -592,9 +592,178 @@ function initCanvasGrid() {
   const connectionDistance = 150;
   const mouse = { x: null, y: null, radius: 250 };
 
+  // DevSecOps 3D Brick Wall data
+  const devSecOpsBricks = [];
+  const brickW = 100;
+  const brickH = 40;
+  const brickGap = 2;
+
+  function generateDevSecOpsBricks() {
+    devSecOpsBricks.length = 0;
+    const cols = Math.ceil(width / (brickW + brickGap)) + 2;
+    const rows = Math.ceil(height / (brickH + brickGap)) + 2;
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const passiveDepth = Math.random() * 0.16; // Uneven textured pattern
+        devSecOpsBricks.push({
+          row: r,
+          col: c,
+          passiveDepth,
+          currentDepth: passiveDepth,
+          targetDepth: passiveDepth
+        });
+      }
+    }
+  }
+
+  generateDevSecOpsBricks();
+
+  // SOC PCB Traces & Vias data
+  const socTraces = [];
+  const maxTraces = 300; // Denser network with collision checks
+  const vias = [];
+  const maxVias = 70; // Scattered via points
+
+  // Grid collision avoidance helpers
+  function getOccupiedGridCells(points) {
+    const cells = new Set();
+    const gridSize = 20;
+    points.forEach(pt => {
+      const gx = Math.round(pt.x / gridSize);
+      const gy = Math.round(pt.y / gridSize);
+      cells.add(`${gx},${gy}`);
+    });
+    for (let i = 0; i < points.length - 1; i++) {
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      const steps = Math.ceil(dist / gridSize);
+      for (let s = 1; s < steps; s++) {
+        const t = s / steps;
+        const x = p1.x + (p2.x - p1.x) * t;
+        const y = p1.y + (p2.y - p1.y) * t;
+        const gx = Math.round(x / gridSize);
+        const gy = Math.round(y / gridSize);
+        cells.add(`${gx},${gy}`);
+      }
+    }
+    return cells;
+  }
+
+  function isOverlapping(candidatePoints, activeTraces) {
+    const candidateCells = getOccupiedGridCells(candidatePoints);
+    for (let i = 0; i < activeTraces.length; i++) {
+      const activeCells = getOccupiedGridCells(activeTraces[i].points);
+      for (let cell of candidateCells) {
+        const coords = cell.split(',').map(Number);
+        const gx = coords[0];
+        const gy = coords[1];
+        // Check surrounding cells to prevent parallel traces touching!
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            if (activeCells.has(`${gx + dx},${gy + dy}`)) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  function generateTrace() {
+    const gridSize = 20;
+    const x0 = Math.floor(Math.random() * (width / gridSize)) * gridSize;
+    const y0 = Math.floor(Math.random() * (height / gridSize)) * gridSize;
+    const points = [{ x: x0, y: y0 }];
+
+    let curX = x0;
+    let curY = y0;
+
+    const flowDir = Math.random() > 0.5 ? 1 : -1;
+    const stages = 1; // Strictly 1 stage for tiny lines
+
+    for (let s = 0; s < stages; s++) {
+      // 1. Horizontal segment (tiny run: 20px or 40px)
+      const hLen = Math.floor(Math.random() * 2 + 1) * gridSize * flowDir;
+      curX += hLen;
+      points.push({ x: curX, y: curY });
+
+      // 2. Diagonal 45-degree segment (tiny run: 20px)
+      const dLen = gridSize;
+      const dDirY = Math.random() > 0.5 ? 1 : -1;
+      curX += dLen * flowDir;
+      curY += dLen * dDirY;
+      points.push({ x: curX, y: curY });
+    }
+
+    // Final horizontal extension (tiny extension: 20px)
+    const finalLen = gridSize * flowDir;
+    curX += finalLen;
+    points.push({ x: curX, y: curY });
+
+    let totalLen = 0;
+    const segments = [];
+    for (let i = 0; i < points.length - 1; i++) {
+      const d = Math.hypot(points[i + 1].x - points[i].x, points[i + 1].y - points[i].y);
+      segments.push({ p1: points[i], p2: points[i + 1], len: d, startLen: totalLen });
+      totalLen += d;
+    }
+
+    return {
+      points,
+      segments,
+      totalLen,
+      startProgress: 0.0, // tail of crawler (0 to 1)
+      endProgress: 0.0,   // head of crawler (0 to 1)
+      growSpeed: Math.random() * 0.005 + 0.003, // Slower growth
+      retractSpeed: Math.random() * 0.005 + 0.003, // Slower retraction
+      state: 'growing', // 'growing' | 'retracting'
+      width: Math.random() * 1.2 + 0.8,
+      delay: Math.random() < 0.40 ? 0 : Math.random() * 100 // Staggered delay, 40% spawn immediately
+    };
+  }
+
+  function tryGenerateNonOverlappingTrace() {
+    for (let attempts = 0; attempts < 35; attempts++) {
+      const trace = generateTrace();
+      if (!isOverlapping(trace.points, socTraces)) {
+        return trace;
+      }
+    }
+    return null;
+  }
+
+  function generateVias() {
+    vias.length = 0;
+    const gridSize = 20;
+    for (let i = 0; i < maxVias; i++) {
+      vias.push({
+        x: Math.floor(Math.random() * (width / gridSize)) * gridSize,
+        y: Math.floor(Math.random() * (height / gridSize)) * gridSize
+      });
+    }
+  }
+
+  // Populate initially using non-overlapping generator
+  for (let i = 0; i < maxTraces; i++) {
+    const trace = tryGenerateNonOverlappingTrace();
+    if (trace) socTraces.push(trace);
+  }
+  generateVias();
+
   window.addEventListener('resize', () => {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
+
+    socTraces.length = 0;
+    for (let i = 0; i < maxTraces; i++) {
+      const trace = tryGenerateNonOverlappingTrace();
+      if (trace) socTraces.push(trace);
+    }
+    generateVias();
+    generateDevSecOpsBricks();
   });
 
   document.addEventListener('mousemove', (e) => {
@@ -616,9 +785,10 @@ function initCanvasGrid() {
       this.size = Math.random() * 2 + 1;
     }
 
-    update() {
-      this.x += this.vx;
-      this.y += this.vy;
+    update(isSoc) {
+      const speedFactor = isSoc ? 0.5 : 1.0;
+      this.x += this.vx * speedFactor;
+      this.y += this.vy * speedFactor;
 
       if (this.x < 0) this.x = width;
       if (this.x > width) this.x = 0;
@@ -626,11 +796,16 @@ function initCanvasGrid() {
       if (this.y > height) this.y = 0;
     }
 
-    draw() {
+    draw(themeRGB, isSoc) {
       ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 3);
-      ctx.fillStyle = 'rgba(214, 31, 38, 0.7)';
-      ctx.fill();
+      if (isSoc) {
+        ctx.fillStyle = `rgba(${themeRGB}, 0.8)`;
+        ctx.fillRect(this.x - 2, this.y - 2, 4, 4);
+      } else {
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${themeRGB}, 0.7)`;
+        ctx.fill();
+      }
     }
   }
 
@@ -638,42 +813,427 @@ function initCanvasGrid() {
     particles.push(new Particle());
   }
 
+  function getThemeRGB() {
+    return window.getComputedStyle(document.body).getPropertyValue('--color-primary-rgb') || '214, 31, 38';
+  }
+
+  function drawIsoCube(ctx, x, y, size, angle, hue, alpha) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+
+    const h = size * 0.5;
+    const w = size * 0.866;
+
+    // Top Face
+    ctx.beginPath();
+    ctx.moveTo(0, -size);
+    ctx.lineTo(w, -h);
+    ctx.lineTo(0, 0);
+    ctx.lineTo(-w, -h);
+    ctx.closePath();
+    ctx.fillStyle = `hsla(${hue}, 80%, 75%, ${alpha * 0.95})`;
+    ctx.fill();
+    ctx.strokeStyle = `hsla(${hue}, 80%, 65%, ${alpha * 0.25})`;
+    ctx.stroke();
+
+    // Left Face
+    ctx.beginPath();
+    ctx.moveTo(-w, -h);
+    ctx.lineTo(0, 0);
+    ctx.lineTo(0, size);
+    ctx.lineTo(-w, h);
+    ctx.closePath();
+    ctx.fillStyle = `hsla(${hue}, 70%, 45%, ${alpha * 0.7})`;
+    ctx.fill();
+    ctx.strokeStyle = `hsla(${hue}, 70%, 40%, ${alpha * 0.2})`;
+    ctx.stroke();
+
+    // Right Face
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(w, -h);
+    ctx.lineTo(w, h);
+    ctx.lineTo(0, size);
+    ctx.closePath();
+    ctx.fillStyle = `hsla(${hue}, 75%, 30%, ${alpha * 0.8})`;
+    ctx.fill();
+    ctx.strokeStyle = `hsla(${hue}, 75%, 25%, ${alpha * 0.2})`;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function getPointAlongTrace(trace, t) {
+    const targetLen = t * trace.totalLen;
+    for (let i = 0; i < trace.segments.length; i++) {
+      const seg = trace.segments[i];
+      if (targetLen >= seg.startLen && targetLen <= seg.startLen + seg.len) {
+        const segT = (targetLen - seg.startLen) / seg.len;
+        return {
+          x: seg.p1.x + (seg.p2.x - seg.p1.x) * segT,
+          y: seg.p1.y + (seg.p2.y - seg.p1.y) * segT
+        };
+      }
+    }
+    return trace.points[trace.points.length - 1];
+  }
+
+  function distToSegment(M, A, B) {
+    const dx = B.x - A.x;
+    const dy = B.y - A.y;
+    const lenSq = dx * dx + dy * dy;
+    if (lenSq === 0) return Math.hypot(M.x - A.x, M.y - A.y);
+    let t = ((M.x - A.x) * dx + (M.y - A.y) * dy) / lenSq;
+    t = Math.max(0, Math.min(1, t));
+    return Math.hypot(M.x - (A.x + t * dx), M.y - (A.y + t * dy));
+  }
+
+  function getMinDistToTrace(trace, mx, my) {
+    let minDist = Infinity;
+    const M = { x: mx, y: my };
+    for (let i = 0; i < trace.segments.length; i++) {
+      const d = distToSegment(M, trace.segments[i].p1, trace.segments[i].p2);
+      if (d < minDist) minDist = d;
+    }
+    return minDist;
+  }
+
+  function drawSegmentPath(ctx, trace, startT, endT) {
+    if (endT <= startT) return;
+    const startLen = startT * trace.totalLen;
+    const endLen = endT * trace.totalLen;
+
+    const pStart = getPointAlongTrace(trace, startT);
+    ctx.moveTo(pStart.x, pStart.y);
+
+    for (let i = 0; i < trace.points.length; i++) {
+      let vLen = 0;
+      if (i > 0) {
+        const seg = trace.segments[i - 1];
+        vLen = seg.startLen + seg.len;
+      }
+      if (vLen > startLen && vLen < endLen) {
+        ctx.lineTo(trace.points[i].x, trace.points[i].y);
+      }
+    }
+
+    const pEnd = getPointAlongTrace(trace, endT);
+    ctx.lineTo(pEnd.x, pEnd.y);
+  }
+
   function animate() {
     ctx.clearRect(0, 0, width, height);
 
-    particles.forEach(p => {
-      p.update();
-      p.draw();
-    });
+    const themeRGB = getThemeRGB().trim();
+    const persona = window.currentPersona || 'vapt';
+    const isSoc = persona === 'soc';
 
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const p1 = particles[i];
-        const p2 = particles[j];
-        const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+    if (persona === 'grc') {
+      // ==========================================
+      // GRC Honey Blocks with Compliance Names (Procedural Style)
+      // ==========================================
+      const r = 45; // Hexagon radius
+      const gap = 2.5; // Gap size (ensures all boxes appear separated)
+      const drawR = r - gap; // Scaled radius for gap effect
+      const hexWidth = r * Math.sqrt(3);
+      const hexHeight = r * 1.5;
 
-        if (dist < connectionDistance) {
-          const alpha = (1 - dist / connectionDistance) * 0.32;
+      const cols = Math.ceil(width / hexWidth) + 1;
+      const rows = Math.ceil(height / hexHeight) + 1;
+
+      ctx.font = '10px "Fira Code", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const complianceAbbrs = [
+        "ISO", "NIST", "GDPR", "SOC", "HIPAA", "PCI", "COBIT",
+        "CIS", "OWASP", "FISMA", "ITIL", "CMMC", "FedRAMP", "SOX",
+        "CSA", "GLBA", "NERC", "HITRUST"
+      ];
+
+      const time = Date.now() * 0.002;
+
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const xOffset = (row % 2) * (hexWidth / 2);
+          const hx = col * hexWidth + xOffset;
+          const hy = row * hexHeight;
+
+          const dist = mouse.x !== null && mouse.y !== null ? Math.hypot(hx - mouse.x, hy - mouse.y) : Infinity;
+          const radius = 220;
+          const mouseGlow = dist < radius ? Math.pow(1 - dist / radius, 1.8) : 0;
+          const breathe = Math.sin(time + hx * 0.003 + hy * 0.003);
+          const finalGlow = Math.max(0, Math.max(mouseGlow, breathe * 0.08));
+
+          // Draw hex path (Single hexagon with clear gap)
           ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = `rgba(214, 31, 38, ${alpha})`;
-          ctx.lineWidth = 1.2;
+          for (let angleIdx = 0; angleIdx < 6; angleIdx++) {
+            const angle = (Math.PI / 3) * angleIdx - Math.PI / 2;
+            const px = hx + drawR * Math.cos(angle);
+            const py = hy + drawR * Math.sin(angle);
+            if (angleIdx === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+
+          // Soft Techy Bloom Shadow (low vibrance)
+          if (finalGlow > 0.1) {
+            ctx.shadowBlur = finalGlow * 8;
+            ctx.shadowColor = `rgba(${themeRGB}, 0.22)`;
+          }
+
+          // Dark GRC Fill
+          ctx.fillStyle = 'rgba(3, 8, 4, 0.85)';
+          ctx.fill();
+
+          ctx.shadowBlur = 0; // Reset bloom shadow
+
+          // Stroke width & border alpha (soft glow transition)
+          const borderAlpha = 0.08 + finalGlow * 0.32;
+          ctx.strokeStyle = `rgba(${themeRGB}, ${borderAlpha})`;
+          ctx.lineWidth = 1.0 + finalGlow * 1.0; // 1px to 2px
           ctx.stroke();
+
+          // Render Compliance Labels in EVERY box, ensuring adjacent blocks are distinct via prime combination
+          const nameIndex = Math.abs(row * 31 + col * 17) % complianceAbbrs.length;
+          const name = complianceAbbrs[nameIndex];
+
+          // Soft, non-vibrant text opacity mapping
+          const textAlpha = 0.12 + finalGlow * 0.38; // 0.12 to 0.50 text range
+          ctx.fillStyle = `rgba(${themeRGB}, ${textAlpha})`;
+          ctx.fillText(name, hx, hy);
+        }
+      }
+    }
+    else if (persona === 'devsecops') {
+      // ==========================================
+      // DevSecOps 3D Emerging Floating Brick Grid
+      // ==========================================
+      const drawW = brickW - brickGap;
+      const drawH = brickH - brickGap;
+
+      devSecOpsBricks.forEach(brick => {
+        // Calculate brick base position
+        const xOffset = (brick.row % 2) * ((brickW + brickGap) / 2);
+        const bx = brick.col * (brickW + brickGap) - (brickW + brickGap) / 2 + xOffset;
+        const by = brick.row * (brickH + brickGap) - (brickH + brickGap) / 2;
+
+        const centerX = bx + drawW / 2;
+        const centerY = by + drawH / 2;
+
+        // Proximity calculation for hover
+        let dist = Infinity;
+        if (mouse.x !== null && mouse.y !== null) {
+          dist = Math.hypot(centerX - mouse.x, centerY - mouse.y);
+        }
+
+        const radius = 220;
+        if (dist < radius) {
+          const factor = Math.pow(1 - dist / radius, 1.6);
+          brick.targetDepth = brick.passiveDepth + factor * 0.84; // Pop out on hover
+        } else {
+          brick.targetDepth = brick.passiveDepth;
+        }
+
+        // Smoothly interpolate current depth
+        brick.currentDepth += (brick.targetDepth - brick.currentDepth) * 0.12;
+
+        const z = brick.currentDepth;
+
+        // 1. Draw Drop Shadow (cast down and right)
+        if (z > 0.02) {
+          ctx.beginPath();
+          ctx.rect(bx + z * 8 + 1, by + z * 8 + 1, drawW, drawH);
+          ctx.fillStyle = `rgba(0, 0, 0, ${z * 0.45})`;
+          ctx.fill();
+        }
+
+        // Shifted coordinates of the brick face (shift up and left to emerge)
+        const sx = bx - z * 5;
+        const sy = by - z * 5;
+
+        // 2. Draw Semi-Transparent Brick Face (dark purple matching body bg)
+        ctx.beginPath();
+        ctx.rect(sx, sy, drawW, drawH);
+        ctx.fillStyle = `rgba(6, 2, 11, ${0.85 + z * 0.10})`;
+        ctx.fill();
+
+        // 3. Draw Bevel Edge Highlights (top and left)
+        ctx.beginPath();
+        ctx.moveTo(sx, sy + drawH);
+        ctx.lineTo(sx, sy);
+        ctx.lineTo(sx + drawW, sy);
+        ctx.strokeStyle = `rgba(255, 255, 255, ${0.05 + z * 0.20})`;
+        ctx.lineWidth = 1.0;
+        ctx.stroke();
+
+        // 4. Draw Bevel Edge Shadows (bottom and right)
+        ctx.beginPath();
+        ctx.moveTo(sx + drawW, sy);
+        ctx.lineTo(sx + drawW, sy + drawH);
+        ctx.lineTo(sx, sy + drawH);
+        ctx.strokeStyle = `rgba(0, 0, 0, ${0.25 + z * 0.25})`;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        // 5. High-Tech Neon Border Outline (glowing purple boundary)
+        const borderAlpha = 0.08 + z * 0.32;
+        ctx.beginPath();
+        ctx.rect(sx, sy, drawW, drawH);
+        ctx.strokeStyle = `rgba(168, 85, 247, ${borderAlpha})`;
+        ctx.lineWidth = 1.0 + z * 1.0;
+        ctx.stroke();
+      });
+    }
+    else if (persona === 'soc') {
+      // ==========================================
+      // SOC: PCB Circuit and Signal Animation
+      // ==========================================
+
+      // 2. Update and Draw Meander Copper Traces
+      for (let i = socTraces.length - 1; i >= 0; i--) {
+        const trace = socTraces[i];
+
+        // A. Handle staggered spawning delay
+        if (trace.delay > 0) {
+          trace.delay--;
+          continue; // Skip rendering/updating until delay expires
+        }
+
+        // B. Update Animation State
+        if (trace.state === 'growing') {
+          trace.endProgress += trace.growSpeed;
+          if (trace.endProgress >= 1) {
+            trace.endProgress = 1;
+            trace.state = 'retracting';
+          }
+        } else if (trace.state === 'retracting') {
+          trace.startProgress += trace.retractSpeed;
+          if (trace.startProgress >= 1) {
+            socTraces.splice(i, 1);
+            const newTrace = tryGenerateNonOverlappingTrace();
+            if (newTrace) {
+              newTrace.delay = Math.random() * 30; // Short delay on replacement to keep background active
+              socTraces.push(newTrace);
+            }
+            continue;
+          }
+        }
+
+        // C. Calculate Hover Highlight
+        let mouseHighlight = 0;
+        if (mouse.x !== null && mouse.y !== null) {
+          const distToCursor = getMinDistToTrace(trace, mouse.x, mouse.y);
+          const highlightRadius = 180;
+          if (distToCursor < highlightRadius) {
+            mouseHighlight = Math.pow(1 - distToCursor / highlightRadius, 1.5) * 0.85;
+          }
+        }
+
+        // D. Draw Trace Path
+        ctx.beginPath();
+        drawSegmentPath(ctx, trace, trace.startProgress, trace.endProgress);
+
+        // Apply neon glow on hover
+        if (mouseHighlight > 0.1) {
+          ctx.shadowBlur = mouseHighlight * 10;
+          ctx.shadowColor = `rgba(${themeRGB}, 0.75)`;
+        }
+
+        const strokeAlpha = Math.max(0.05, 0.22 + mouseHighlight * 0.28);
+        ctx.strokeStyle = `rgba(${themeRGB}, ${strokeAlpha})`;
+        ctx.lineWidth = trace.width + (mouseHighlight * 1.0);
+        ctx.stroke();
+        ctx.shadowBlur = 0; // reset
+
+        // E. Draw Solder Pads
+        // Start pad (drawn only while tail progress is 0)
+        if (trace.startProgress === 0 && trace.endProgress > 0) {
+          ctx.beginPath();
+          ctx.arc(trace.points[0].x, trace.points[0].y, 2.6, 0, Math.PI * 2);
+          const padAlpha = Math.max(0.12, 0.45 + mouseHighlight * 0.15);
+          ctx.fillStyle = `rgba(${themeRGB}, ${padAlpha})`;
+          ctx.fill();
+        }
+
+        // End pad (drawn once head progress is 1 and tail hasn't reached it)
+        if (trace.endProgress >= 1 && trace.startProgress < 1) {
+          ctx.beginPath();
+          ctx.arc(trace.points[trace.points.length - 1].x, trace.points[trace.points.length - 1].y, 2.6, 0, Math.PI * 2);
+          const padAlpha = Math.max(0.12, 0.45 + mouseHighlight * 0.15);
+          ctx.fillStyle = `rgba(${themeRGB}, ${padAlpha})`;
+          ctx.fill();
         }
       }
 
+      // Draw Concentric HUD radar sweep over mouse coords if active
       if (mouse.x !== null && mouse.y !== null) {
-        const p = particles[i];
-        const mDist = Math.hypot(p.x - mouse.x, p.y - mouse.y);
-        if (mDist < mouse.radius) {
-          const alpha = (1 - mDist / mouse.radius) * 0.45;
+        for (let r = 0; r < 2; r++) {
+          const rippleTime = Date.now() * 0.035;
+          const radius = (rippleTime + r * 70) % 150;
+          const alpha = (1 - radius / 150) * 0.20;
+
           ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(mouse.x, mouse.y);
-          ctx.strokeStyle = `rgba(214, 31, 38, ${alpha})`;
-          ctx.lineWidth = 1.2;
+          ctx.arc(mouse.x, mouse.y, radius, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(0, 210, 255, ${alpha})`;
+          ctx.lineWidth = 1;
           ctx.stroke();
+        }
+
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, 20, 0, Math.PI * 2);
+        ctx.moveTo(mouse.x - 30, mouse.y);
+        ctx.lineTo(mouse.x - 8, mouse.y);
+        ctx.moveTo(mouse.x + 8, mouse.y);
+        ctx.lineTo(mouse.x + 30, mouse.y);
+        ctx.moveTo(mouse.x, mouse.y - 30);
+        ctx.lineTo(mouse.x, mouse.y - 8);
+        ctx.moveTo(mouse.x, mouse.y + 8);
+        ctx.lineTo(mouse.x, mouse.y + 30);
+        ctx.strokeStyle = `rgba(0, 210, 255, 0.35)`;
+        ctx.lineWidth = 1.0;
+        ctx.stroke();
+      }
+    }
+    else {
+      // ==========================================
+      // VAPT / Default: Particles network
+      // ==========================================
+      particles.forEach(p => {
+        p.update(isSoc);
+        p.draw(themeRGB, isSoc);
+      });
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const p1 = particles[i];
+          const p2 = particles[j];
+          const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+
+          if (dist < connectionDistance) {
+            const alpha = (1 - dist / connectionDistance) * 0.32;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(${themeRGB}, ${alpha})`;
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+          }
+        }
+
+        if (mouse.x !== null && mouse.y !== null) {
+          const p = particles[i];
+          const mDist = Math.hypot(p.x - mouse.x, p.y - mouse.y);
+          if (mDist < mouse.radius) {
+            const alpha = (1 - mDist / mouse.radius) * 0.45;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.strokeStyle = `rgba(${themeRGB}, ${alpha})`;
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+          }
         }
       }
     }
@@ -782,6 +1342,11 @@ function initPersonaSelector() {
 function switchPersona(personaId) {
   const data = PERSONA_DATA[personaId];
   if (!data) return;
+
+  // Update body class for styling theme overrides
+  document.body.className = document.body.className.replace(/\bpersona-\S+/g, '');
+  document.body.classList.add(`persona-${personaId}`);
+  window.currentPersona = personaId;
 
   // 1. Toggle button classes
   document.querySelectorAll('.protocol-btn').forEach(btn => {
@@ -1407,7 +1972,7 @@ function getProjectThumbnail(title) {
 function openImageModal(src, isCertificate = false) {
   const modal = document.createElement('div');
   modal.className = 'project-image-modal';
-  
+
   let modalHTML = `
     <div class="project-image-modal-content">
       <img src="${src}" alt="Preview Image" />
@@ -1416,7 +1981,7 @@ function openImageModal(src, isCertificate = false) {
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
     </button>
   `;
-  
+
   if (isCertificate) {
     modalHTML += `
       <button class="modal-nav-btn prev-cert-btn" aria-label="Previous Certificate">
